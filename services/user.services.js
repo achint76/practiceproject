@@ -57,10 +57,31 @@ const UserService = {
     },
 
     async userLogin(email, password){
+        try {
+            const user = await UserService.getUserByEmail(email);
+            if (!user) {
+                return { success: false, message: "Invalid email" };
+            }
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                return { success: false, message: 'Incorrect password' };
+            }
+            const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '24h' });
+            return { success: true, message: 'User logged in successfully', token, userId: user._id };
+        } catch (error) {
+            console.error("Error logging in:", error);
+            throw new Error("Internal Server Error");
+        }
+    },
+
+    async getUserByEmail(e_mail){
         try{
+            const isEmail = await UserModel.findOne({ email: e_mail});
+            return isEmail;
             
         }catch(error){
-            throw error;
+            console.error("Getting error in getting  the email", error);
+            throw new Error("Internal Server Error");
         }
     }
 };

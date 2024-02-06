@@ -1,3 +1,6 @@
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
+//const session = require('express-session');
 const UserService = require('../services/user.services');
 const bcrypt = require('bcrypt');
 const saltRounds = 10; // Number of salt rounds for bcrypt
@@ -133,17 +136,23 @@ const UserController = {
 
     async userLogin(req, res){
         try{
-            const data = req.body;
-            const email = req.body.email;
-            const password = req.body.password;
-            const loginData = await UserService.userLogin(email, password);
+            const { email, password } = req.body;
+            const user = await UserService.getUserByEmail(email);
+            if(!user){
+                return res.status(401).json({ success: false, message: "Invalid email"});
+            }
+            console.log("USER PASSWORD", user.password);
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                return res.status(401).json({ success: false, message: 'Incorrect password' });
+            }
+            const token = jwt.sign({ id: user._id, email: user.email}, process.env.JWT_SECRET, { expiresIn: '24h'});
+            
+            req.session.user = { id: user._id, email: user.email }; 
+            
             
 
-            res.status(200).json({
-                success: true,
-                message: 'user login successfully',
-                //user: 
-            })
+            res.status(200).json({ success: true, message: 'User logged in successfully', token });
         }catch(error){
             console.error("getting error in login", error);
             res.status(500).json({
@@ -156,3 +165,4 @@ const UserController = {
 };
 
 module.exports = UserController;
+
