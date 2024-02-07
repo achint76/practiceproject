@@ -1,7 +1,7 @@
 const UserFeaturesService = require('../services/user-features.service');
 
 const UserFeaturesController = {
-    async createFriendRequest(req, res){
+    async sendFriendRequest(req, res){
         try{
             res.status(200).json({
                 success: true,
@@ -100,7 +100,7 @@ const UserFeaturesController = {
         }
     },
     
-    async friendApprovalStatus(req, res){
+    async acceptRequest(req, res){
         try{
             const data = req.body;
             const id = req.body._id;
@@ -125,6 +125,14 @@ const UserFeaturesController = {
 
             })
         }
+    },
+
+    async friendRequestStatus(req, res){
+
+    },
+    async rejectRequest(req, res){
+
     }
 };
 module.exports = UserFeaturesController;
+

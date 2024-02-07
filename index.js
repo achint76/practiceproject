@@ -30,6 +30,6 @@ app.use('/user', userRoute);
 
 app.listen(port, () => {
     connect();
-    console.log(` Server listening at ${url}:${port}`);
+    console.log(`Server listening at ${url}:${port}`);
 })
 

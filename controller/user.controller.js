@@ -161,6 +161,19 @@ const UserController = {
                 error: error.message
             })
         }
+    },
+
+    async logout(req, res){
+        try{
+        res.status(200).json({ success: true, message: 'User logged out successfully', token });
+        }catch(error){
+            console.error("Getting error in logging out:", error);
+            res.status(500).json({
+                success: false,
+                message: 'Internal server error',
+                error: error.message
+            })
+        }
     }
 };
 
