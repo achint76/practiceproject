@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const ChatModel = require('../models/chatmessages.model');
 
 const ChatService = {
-    async 
+    async createChat(payload){
+        const Chatdata = await ChatModel.create(payload);
+    }
 };
 module.exports = ChatService;

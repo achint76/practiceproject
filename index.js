@@ -14,7 +14,7 @@ app.use(session({
 }));
 app.use(express.json());
 const userRoute = require('./router/user.router');
-
+const conversationRoute = require('./router/conversation.router');
 const connect = async() => {
     try{
         await mongoose.connect(process.env.MONGO);
@@ -27,6 +27,7 @@ const connect = async() => {
 
 
 app.use('/user', userRoute);
+app.use('/conversation', conversationRoute);
 
 app.listen(port, () => {
     connect();

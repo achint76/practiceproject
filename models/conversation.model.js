@@ -1,15 +1,20 @@
 const mongoose = require('mongoose');
 const ConversationSchema = mongoose.Schema({
-    user_id: {
+    // user_id: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'users',
+    //     required: true
+    // },
+    // friend_id: {
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: 'users',
+    //     required: true
+    // },
+    user_ids: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
+        ref: 'users', // Refers to the User model
         required: true
-    },
-    friend_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'users',
-        required: true
-    },
+    }],
     created_at: {
         type: Date,
         default: Date.now
