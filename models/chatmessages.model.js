@@ -18,6 +18,10 @@ const ChatSchema = mongoose.Schema({
     message: {
         type: String,
         
+    },
+    is_deleted: {
+        type: Boolean,
+        default: false
     }
 },
 {

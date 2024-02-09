@@ -1,87 +1,83 @@
 const ConversationService = require('../services/conservation.service');
 const ChatService = require('../services/chat.services');
 const ConversationController = {
-    // async createConversation(req, res){
-    //     const { user_id, friend_id } = req.body;
-    //     if(!user_id || !friend_id){
-    //         throw new Error('Both user_id and friend_id are required');
-    //     }
-    //     const payload = {};
-    //     payload.user_id = user_id;
-    //     payload.friend_id = friend_id;
-    //     console.log(payload,"PAYLOAD");
-    //     const checkConversation = await ConversationService.createConversation(payload);
-    //     if(!checkConversation){
-    //         res.status(500).json({
-    //             success: false,
-    //             message: 'Getting error in checking Conversation',
-    //             error: error.message
-    //         })
-    //     }
-    //     res.status(200).json({
-    //         success: true,
-    //         message: 'conversation made or already exists',
-    //         user: checkConversation
-    //     })
-    // }
+    
     async createConversation(req, res) {
         try {
-            console.log("REQBODY", req.body.user_ids[0]);
-            const conversation = await ConversationService.findConversation({
-                friend_id: req.body.user_ids[0],
-                user_id: req.body.user_ids[1]
-            });
-            if (!conversation || conversation == null) {
-                
-                const createConv = await ConversationService.createConversation({
-                    user_id: req.body.user_id,
-                    friend_id: req.body.friend_id,
-                    message: req.body.message
-                });
-                const payload = {};
-                payload.conversation_id = createConv._id;
-                payload.user_id = user_id,
-                payload.friend_id = friend_id,
-                payload.message = message
-                // const chatdata = await ChatService.createChat({
-                //     conversation_id: req.body.conversation_id,
-                //     user_id: req.body.user_id,
-                //     friend_id: req.body.friend_id,
-                //     message: req.body.message
-                // });
-                const chatdata = await ChatService.createChat(payload);
-                res.status(200).json({
-                    success: true,
-                    data: chatdata
-                });
-            } else {
-                // const newChatdata = await ConversationService.createChat({
-                //     conversation_id: req.body.conversation_id,
-                //     user_id: req.body.user_id,
-                //     friend_id: req.body.friend_id,
-                //     message: req.body.message
-                // })
-                const payload = {};
-                payload.conversation_id = conversation_id;
-                payload.user_id = user_id,
-                payload.friend_id = friend_id,
-                payload.message = message
-                const newChatdata = await ChatService.createChat(payload);
-                res.status(200).json({
-                    success: true,
-                    data: newChatdata
-                })
+            const { user_ids, message } = req.body;
+            if(!user_ids || user_ids.length !== 2 ){
+                throw new Error("Invalid user ids provided!");
             }
-        }
+            console.log("1stCheck", user_ids);
+            //first check if conversation already exists
+            const conversation = await ConversationService.findConversation({
+                user_ids
+            })
+            console.log("CON EXIST OR NOT", conversation);
+            //if conversation doesn't exists create a new one
+            if(!conversation){
+                const newConversation = await ConversationService.createConversation({
+                    user_ids, message
+                })
+                console.log("CON DON't EXISTS", newConversation);
+                //create chat message for newly created conversation
+                const chatData = await ChatService.createChat({
+                    conversation_id: newConversation._id,
+                    user_id: user_ids[0],
+                    friend_id: user_ids[1],
+                    message
+                })
+                console.log("CHat for newconv", chatData);
+                res.status(200).json({
+                    success: true,
+                    data: chatData
+                })
+            }else{
+                //if conversation already exists, add a new chat message to it
+                const Chatdata = await ChatService.createChat({
+                    conversation_id: conversation._id,
+                    user_id: user_ids[0],
+                    friend_id: user_ids[1],
+                    message
+                });
+                console.log("IF IT CONV EXIST", Chatdata);
 
-        catch (error) {
-            console.error("Getting error in creating conversation:", error);
+                res.status(200).json({
+                    success: true,
+                    data: Chatdata
+                });
+
+            }
+        }catch(error){
+            console.error("Error in creating conversation:", error);
             res.status(500).json({
                 success: false,
-                message: 'Getting error in creating  conversation',
+                message: 'Getting error in creating conversation',
                 error: error.message
             })
         }
+    },
+
+    async listingConversation(req, res){
+        try{
+            res.status(200).json({
+                success: true,
+                message: 'Listing successful',
+                data
+            })
+        }catch(error){
+            console.error("GEtting error in listing:", error);
+            res.status(500).json({
+                success: false,
+                message: 'error in listing conversation',
+                error: error.message
+            });
+        }
     }
+
+
+
+
+    
 };
 module.exports = ConversationController;

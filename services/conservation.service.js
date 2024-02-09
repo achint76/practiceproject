@@ -2,32 +2,21 @@ const mongoose = require('mongoose');
 const ConversationModel = require('../models/conversation.model');
 const ChatService = require('../services/chat.services');
 const ConversationService = {
-    async findConversation({ friend_id, user_id }) {
-        const isavl = await ConversationModel.aggregate([
-            {
-                $match: {
-                    user_ids: { $all: [user_id, friend_id]}
-                }
-            }
-        ])
+    async findConversation({ user_ids }) {
+        console.log("USERI(DS", user_ids);
+        
+        const isavl = await ConversationModel.findOne({ user_ids}).exec();
+        console.log(isavl,"ISAVL");
+        return isavl;
     },
 
-    async createConversation({ friend_id, user_id, message}) {
-        // try {
-        //     const existConversation = await this.findConversation();
-        //     if (!existConversation) {
-        //         const createConv = await ConversationModel.create(payload);
-        //         return createConv;
-        //     }
-        //     const startChat = await ChatService.startChat();
-        //     return startChat;
-        // } catch (error) {
-        //     throw error;
-        // }
+    async createConversation({ user_ids, message}) {
+       
         try{
             const convData = await ConversationModel.create({
-                user_ids: [user_id, friend_id]
+                user_ids: user_ids, message
             })
+            console.log("CONVDATA", convData);
             return convData;
         }catch(error){
             throw error;
